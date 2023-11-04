@@ -52,15 +52,14 @@ def draw(ant_h=0):
     for ant in Ants:
         if ant.health < 0:
             ant.kill()
-            continue
         for apple in Apples:
             eats_apple = ant.rect.colliderect(apple.rect)
             if eats_apple:
                 ant.score += 1
-                ant.health += 50
+                ant.health += 10
                 apple.kill()
-                continue
-        if ant_h > 5:
+
+        if ant_h > 2:
             ant.health -= 1
             ant_h = 0
 
