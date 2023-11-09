@@ -5,6 +5,10 @@ from random import randint
 from NN import NeuralNetwork
 
 
+def clamp(num, min_value, max_value):
+    return max(min(num, max_value), min_value)
+
+
 class AntBot(pygame.sprite.Sprite):
     def __init__(self, w=40, h=40):
         super().__init__()
@@ -12,6 +16,7 @@ class AntBot(pygame.sprite.Sprite):
         self.h = h
         self.pos = pygame.math.Vector2(randint(self.w, 1000 - self.w), randint(self.h, 1000 - self.h))
         self.angle = 0
+        self.speed = 2
         self.base_image, self.rect = self.load_image()
         self.image = self.base_image
         self.health = 100
@@ -29,26 +34,21 @@ class AntBot(pygame.sprite.Sprite):
 
         return player_image, player_rect
 
-    def clamp(self, num, min_value, max_value):
-        return max(min(num, max_value), min_value)
-
     def move(self, pos):
         # describe the movement and clamp it in the range
-        LR = self.clamp(pos[0], -2, 2)
-        FB = self.clamp(pos[1], -2, 2)
+        FB = clamp(pos[0], -1, 1)
+        LR = clamp(pos[1], -1, 1)
 
-        if (1000 - self.w > LR + self.pos[0] > self.w) and (self.h < FB + self.pos[1] < 1000 - self.h):
+        if (1000 - self.w > LR*self.speed + self.pos[0] > self.w) and (self.h < FB*self.speed + self.pos[1] < 1000 - self.h):
             # calculate the angle
-            self.angle =  np.degrees(math.atan2(self.pos[0] - self.pos[1], self.pos[0] - self.pos[1] ))
+            self.angle = np.degrees(math.atan2(self.pos[0] - self.pos[1], self.pos[0] - self.pos[1] ))
             print(self.angle)
             # negative angle because y-axis is flipped
             # self.image = pygame.transform.rotate(self.base_image, self.angle)
             self.rect = self.image.get_rect(center=self.pos)
             # new position of Ant
-            self.pos[0] += LR
-            self.pos[1] += FB
-
-
+            self.pos[0] += LR*self.speed
+            self.pos[1] += FB*self.speed
 
     def update(self):
         params = self.Brain.calculate(self.health, self.score)

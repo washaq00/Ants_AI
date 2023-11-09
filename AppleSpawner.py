@@ -1,12 +1,13 @@
 from Apple import Apple
 import pygame as pg
 
+
 class AppleSpawner:
-    def __init__(self, spawnrate = 1, len = 0):
+    def __init__(self, spawnrate = 1, n_bots = 0):
         self.sr: float = spawnrate
         self.Apples = pg.sprite.Group()
         self.timeElapsed: int = 0
-        self.nApples = len
+        self.nApples = n_bots
 
     def begin(self):
         for i in range(0, self.nApples):
