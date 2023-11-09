@@ -55,15 +55,15 @@ while True: # all actions are being placed and updated in this loop
 
     screen.blit(background_surface, (0, 0))
 
-        # Bots
-        n_bots = 5
+# Bots
+    n_bots = 5
 
-        Ants = pygame.sprite.Group()
-        for i in range(0, n_bots):
-            Ants.add(AntBot())
+    Ants = pygame.sprite.Group()
+    for i in range(0, n_bots):
+        Ants.add(AntBot())
 
-        ApplesSpawner = AppleSpawner(spawnrate=0.0005, len=20)
-        ApplesSpawner.begin()
+    ApplesSpawner = AppleSpawner(spawnrate=0.0005, len=20)
+    ApplesSpawner.begin()
     draw(dt)
 
     pygame.display.update()
