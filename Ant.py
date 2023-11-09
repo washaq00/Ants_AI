@@ -2,7 +2,7 @@ import pygame
 import numpy as np
 import math
 from random import randint
-
+from NN import NeuralNetwork
 
 
 class AntBot(pygame.sprite.Sprite):
@@ -10,13 +10,13 @@ class AntBot(pygame.sprite.Sprite):
         super().__init__()
         self.w = w
         self.h = h
-        self.pos = pygame.math.Vector2(randint(self.w, 1000 - self.w),randint(self.h, 1000 - self.h))
+        self.pos = pygame.math.Vector2(randint(self.w, 1000 - self.w), randint(self.h, 1000 - self.h))
         self.angle = 0
-        self.speed = 3
         self.base_image, self.rect = self.load_image()
         self.image = self.base_image
         self.health = 100
         self.score = 0
+        self.Brain = NeuralNetwork()
 
     def __del__(self):
         print(f"One ant is dead")
@@ -29,26 +29,28 @@ class AntBot(pygame.sprite.Sprite):
 
         return player_image, player_rect
 
-    def move(self):
-        temp: float = self.pos[0]
-        temp2: float = self.pos[1]
+    def clamp(self, num, min_value, max_value):
+        return max(min(num, max_value), min_value)
 
-        self.angle -= randint(-60, 60)
-        temp += self.speed * math.cos(math.radians(self.angle + 90))
-        temp2 -= self.speed * math.sin(math.radians(self.angle + 90))
-        if (1000 - self.w > temp > self.w) and (self.h < temp2 < 1000 - self.h):
-            self.pos[0] = temp
-            self.pos[1] = temp2
-        self.image = pygame.transform.rotate(self.base_image, self.angle)
-        self.rect = self.image.get_rect(center = self.pos)
+    def move(self, pos):
+        # describe the movement and clamp it in the range
+        LR = self.clamp(pos[0], -2, 2)
+        FB = self.clamp(pos[1], -2, 2)
+
+        if (1000 - self.w > LR + self.pos[0] > self.w) and (self.h < FB + self.pos[1] < 1000 - self.h):
+            # calculate the angle
+            self.angle =  np.degrees(math.atan2(self.pos[0] - self.pos[1], self.pos[0] - self.pos[1] ))
+            print(self.angle)
+            # negative angle because y-axis is flipped
+            # self.image = pygame.transform.rotate(self.base_image, self.angle)
+            self.rect = self.image.get_rect(center=self.pos)
+            # new position of Ant
+            self.pos[0] += LR
+            self.pos[1] += FB
+
 
 
     def update(self):
-        self.move()
-
-
-
-
-
-
-
+        params = self.Brain.calculate(self.health, self.score)
+        print(params)
+        self.move(*params)

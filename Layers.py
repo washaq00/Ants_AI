@@ -1,17 +1,15 @@
 import numpy as np
-from BasicLayer import Layer, relu, sigmoid
+from BasicLayer import Layer
 
 
 class DenseLayer(Layer):
     def __init__(self, input_size, output_size):
         super().__init__()
-        self.weights = np.random.rand(input_size, output_size)
-        self.bias = np.random.rand(input_size, output_size)
+        self.weights = np.random.randn(input_size, output_size)
+        self.bias = np.random.randn(1, output_size)
 
     def forward_prop(self, input_data):
-        self.input = input_data
-        self.output = np.dot(input_data, self.weights) + self.bias
-        return self.output
+        return np.dot(input_data, self.weights) + self.bias
 
 
 class ActivationLayer(Layer):
@@ -20,10 +18,7 @@ class ActivationLayer(Layer):
         self.activation = activation
 
     def forward_prop(self, input_data):
-        self.input = input_data
-        self.output = self.activation(self.input)
-        return self.output
-
+        return self.activation(input_data)
 
 
 

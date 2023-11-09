@@ -25,16 +25,6 @@ color = (255, 0, 0)
 color2 = (0,0,255)
 color3 = (30, 224, 27)
 
-# Bots
-n_bots = 5
-
-Ants = pygame.sprite.Group()
-for i in range(0,n_bots):
-    Ants.add(AntBot())
-
-ApplesSpawner = AppleSpawner(spawnrate=0.0005, len=20)
-ApplesSpawner.begin()
-
 # drawing characters
 def draw(dt = 0)-> None:
 
@@ -47,6 +37,7 @@ def draw(dt = 0)-> None:
                 ant.score += 1
                 ant.health += 10
                 apple.kill()
+        ant.health -=1
 
     ApplesSpawner.spawn(dt)
     Ants.draw(screen)
@@ -63,6 +54,16 @@ while True: # all actions are being placed and updated in this loop
             exit()
 
     screen.blit(background_surface, (0, 0))
+
+        # Bots
+        n_bots = 5
+
+        Ants = pygame.sprite.Group()
+        for i in range(0, n_bots):
+            Ants.add(AntBot())
+
+        ApplesSpawner = AppleSpawner(spawnrate=0.0005, len=20)
+        ApplesSpawner.begin()
     draw(dt)
 
     pygame.display.update()
