@@ -24,6 +24,10 @@ class AppleSpawner:
                 self.Apples.add(Apple())
                 self.nApples +=1
 
+    def update(self,dt, screen):
+        self.spawn(dt)
+        self.Apples.draw(screen)
+
 
 
 

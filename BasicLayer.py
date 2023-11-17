@@ -4,8 +4,8 @@ import numpy as np
 class Layer:
     def __init__(self):
         # super init makes it sure to be compiled in parents classes
-        self.input = None
-        self.output = None
+        self.input_size = None
+        self.output_size = None
 
     def forward(self, input):
         raise NotImplementedError

@@ -43,22 +43,12 @@ def initialize():
 # drawing characters
 def draw(dt=0):
 
-    if AntsPopulation[0].Ants.has:
-        for ant in AntsPopulation[0].Ants:
-            if ant.health < 0:
-                ant.kill()
-            for apple in ApplesSpawner[0].Apples:
-                eats_apple = ant.rect.colliderect(apple.rect)
-                if eats_apple:
-                    ant.score += 1
-                    ant.health += 10
-                    apple.kill()
-            ant.health -= 1
-
-        ApplesSpawner[0].spawn(dt)
-        AntsPopulation[0].Ants.draw(screen)
-        ApplesSpawner[0].Apples.draw(screen)
-        AntsPopulation[0].Ants.update()
+    if len(AntsPopulation[0].Ants) != 0:
+        AntsPopulation[0].update(screen, ApplesSpawner[0].Apples)
+        ApplesSpawner[0].update(dt, screen)
+        return True
+    else:
+        return False
 
 
 while True:  # all actions are being placed and updated in this loop
@@ -74,8 +64,10 @@ while True:  # all actions are being placed and updated in this loop
         initialize()
         CopyPopulation = AntsPopulation[0].Ants.copy()
 
+    if not draw(dt):
+        AntsPopulation.clear()
+        ApplesSpawner.clear()
 
-    draw(dt)
 
     pygame.display.update()
     clock.tick(24)

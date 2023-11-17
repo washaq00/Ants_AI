@@ -10,3 +10,8 @@ class AntsSpawner:
     def begin(self):
         for i in range(0, self.n_ants):
             self.Ants.add(AntBot())
+
+    def update(self,screen,Apples):
+        self.Ants.update(Apples, screen)
+        self.Ants.draw(screen)
+

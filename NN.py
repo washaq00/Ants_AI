@@ -1,22 +1,25 @@
 from Layers import DenseLayer, ActivationLayer
 from BasicLayer import relu, sigmoid, tanh
+import numpy as np
+
+
 
 class NeuralNetwork():
     def __init__(self):
-        self.layer1 = DenseLayer(input_size=2, output_size=5)
-        self.layer2 = ActivationLayer(activation=tanh)
-        self.layer3 = DenseLayer(input_size=5, output_size=2)
-        self.layer4 = ActivationLayer(activation=tanh)
+        self.layers: list[tuple] = []
+        self.layers.append((DenseLayer(input_size=2, output_size=5), False))
+        self.layers.append((ActivationLayer(activation=tanh), True))
+        self.layers.append((DenseLayer(input_size=5, output_size=4), False))
+        self.layers.append((ActivationLayer(activation=tanh), True))
 
     def calculate(self, *input_data):
-        results = self.layer4.forward_prop(self.layer3.forward_prop(self.layer2.forward_prop(self.layer1.forward_prop(input_data))))
-        # results = self.layer3.forward_prop(self.layer1.forward_prop(input_data))
-
-        # print(results)
+        results = input_data
+        for layer in self.layers:
+            results = layer[0].forward(results)
         return results
 
-# Test NN
-
-# if __name__ == '__main__':
-#     NN = NeuralNetwork()
-#     NN.calculate()
+    def mutate(self, mutation_chance):
+        for layer in self.layers:
+            if not layer[1] and mutation_chance > np.random.randint(0,100):
+                layer[0].weights = np.random.randn(layer[0].input_size, layer[0].output_size)
+                layer[0].bias = np.random.randn(1, layer[0].output_size)
