@@ -37,37 +37,40 @@ def initialize():
     ApplesSpawner.append(AppleSpawner(spawnrate=0.0005, n_bots=20))
     ApplesSpawner[0].begin()
 
-    return AntsPopulation
+    return True
 
 
 # drawing characters
 def draw(dt=0):
 
     if len(AntsPopulation[0].Ants) != 0:
-        AntsPopulation[0].update(screen, ApplesSpawner[0].Apples)
+        AntsPopulation[0].update(screen, ApplesSpawner[0].Apples,dt)
         ApplesSpawner[0].update(dt, screen)
         return True
     else:
         return False
 
 
-while True:  # all actions are being placed and updated in this loop
-    dt = clock.tick()
+initialized = False
 
+while True:  # all actions are being placed and updated in this loop
+    dt = pygame.time.get_ticks()
+    initialized = False
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
 
     screen.blit(background_surface, (0, 0))
-    if not AntsPopulation:
-        initialize()
-        CopyPopulation = AntsPopulation[0].Ants.copy()
+    if not AntsPopulation and not initialized:
+        initialized = initialize()
+    elif not AntsPopulation and initialized:
+        AntsPopulation.clear()
+        ApplesSpawner.clear()
 
     if not draw(dt):
         AntsPopulation.clear()
         ApplesSpawner.clear()
 
-
     pygame.display.update()
-    clock.tick(24)
+    clock.tick(60)

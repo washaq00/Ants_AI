@@ -19,6 +19,7 @@ class AppleSpawner:
             self.begin()
         elif self.nApples < 30:
             self.timeElapsed += dt
+            print(self.timeElapsed)
             if self.timeElapsed >= self.sr:
                 self.timeElapsed = 0
                 self.Apples.add(Apple())

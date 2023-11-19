@@ -21,7 +21,7 @@ class AntBot(pygame.sprite.Sprite):
         self.pos = pygame.math.Vector2(randint(self.w, 1000 - self.w), randint(self.h, 1000 - self.h))
         self.center = [self.pos[0] + self.h / 2, self.pos[1] + self.w / 2]
         self.angle = np.random.randint(0,90)
-        self.speed = 5
+        self.speed = 3
 
         #distance to the closest apple
         self.distance = 1000
@@ -31,7 +31,7 @@ class AntBot(pygame.sprite.Sprite):
         self.image = self.base_image
 
         # Track the score
-        self.health = 100
+        self.health = 200
         self.score = 0
 
         # Moves our character
@@ -63,8 +63,7 @@ class AntBot(pygame.sprite.Sprite):
             self.distance = temp_distance
 
     def collisions_and_distance(self, Apples):
-        if self.health < 0:
-            self.kill()
+
         for apple in Apples:
             self.calculate_distance(apple)
             eats_apple = self.rect.colliderect(apple.rect)
@@ -72,7 +71,7 @@ class AntBot(pygame.sprite.Sprite):
                 self.score += 1
                 temp_health = self.health + 50
                 self.distance = 1500
-                if temp_health > 100:
+                if temp_health > 200:
                     self.health = 100
                 else:
                     self.health = temp_health
@@ -119,5 +118,5 @@ class AntBot(pygame.sprite.Sprite):
     def update(self, Apples, screen):
         self.collisions_and_distance(Apples)
         # self.cast_rays(screen)
-        params = self.Brain.calculate(self.distance, self.health, self.score)
+        params = self.Brain.forward(self.distance, self.health, self.score)
         self.move(*params, self.pos)
