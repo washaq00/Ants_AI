@@ -6,6 +6,7 @@ from NN import NeuralNetwork
 
 CASTED_RAYS = 2
 
+
 def clamp(num, min_value, max_value):
     return max(min(num, max_value), min_value)
 
@@ -56,14 +57,16 @@ class AntBot(pygame.sprite.Sprite):
         rotated_image = rotated_image.subsurface(rotated_rectangle).copy()
         return rotated_image
 
+    def calculate_distance(self, apple):
+        temp_distance = np.sqrt(np.square(self.pos[0] - apple.pos[0]) + np.square(self.pos[1] - apple.pos[1]))
+        if temp_distance < self.distance:
+            self.distance = temp_distance
+
     def collisions_and_distance(self, Apples):
         if self.health < 0:
             self.kill()
         for apple in Apples:
-            temp_distance = np.sqrt(np.square(self.pos[0] - apple.pos[0]) + np.square(self.pos[1] - apple.pos[1]))
-            print(temp_distance)
-            if temp_distance < self.distance:
-                self.distance = temp_distance
+            self.calculate_distance(apple)
             eats_apple = self.rect.colliderect(apple.rect)
             if eats_apple:
                 self.score += 1
@@ -102,7 +105,6 @@ class AntBot(pygame.sprite.Sprite):
         elif choice[0] == 2:
             temp1 += math.cos(math.radians(360 - self.angle)) * self.speed
             temp2 += math.sin(math.radians(360 - self.angle)) * self.speed
-
 
         if skip:
             temp1 += math.cos(math.radians(360 - self.angle)) * self.speed

@@ -30,7 +30,7 @@ ApplesSpawner = []
 
 def initialize():
     # Create the population of ants
-    AntsPopulation.append(AntsSpawner(n_bots=5))
+    AntsPopulation.append(AntsSpawner())
     AntsPopulation[0].begin()
 
     # Spawn apples in random locations

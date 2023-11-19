@@ -18,9 +18,12 @@ class NeuralNetwork():
             results = layer[0].forward(results)
         return results
 
-    def mutate(self, mutation_chance):
-        for layer in self.layers:
-            if not layer[1] and mutation_chance > np.random.randint(0,100):
-                for neuron in layer[0].input_size:
-                    layer[0].weights = np.random.randn(layer[0].input_size, layer[0].output_size)
-                    layer[0].bias = np.random.randn(1, layer[0].output_size)
+    def mutate(self, mutation_chance=60):
+        for layer, _ in self.layers:
+            if not _:
+                for i in range(layer.input_size-1):
+                    for j in range(layer.output_size-1):
+                        if mutation_chance > np.random.randint(0, 100):
+                            layer.weights[i,j] = np.random.randn(1, 1)
+                    if mutation_chance > np.random.randint(0, 100):
+                        layer.bias[0,j] = np.random.randn(1, 1)
