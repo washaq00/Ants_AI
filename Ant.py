@@ -4,6 +4,7 @@ import math
 from random import randint
 from NN import NeuralNetwork
 
+CASTED_RAYS = 2
 
 def clamp(num, min_value, max_value):
     return max(min(num, max_value), min_value)
@@ -18,16 +19,15 @@ class AntBot(pygame.sprite.Sprite):
         # Basic variables
         self.pos = pygame.math.Vector2(randint(self.w, 1000 - self.w), randint(self.h, 1000 - self.h))
         self.center = [self.pos[0] + self.h / 2, self.pos[1] + self.w / 2]
-        self.angle = 0
+        self.angle = np.random.randint(0,90)
         self.speed = 5
+
+        #distance to the closest apple
+        self.distance = 1000
 
         # Loading image and rotated image
         self.base_image, self.rect = self.load_image()
         self.image = self.base_image
-
-        # Capture distances to the apples
-        self.sensors = []
-        self.drawn_sensors = []
 
         # Track the score
         self.health = 100
@@ -42,35 +42,47 @@ class AntBot(pygame.sprite.Sprite):
     def load_image(self):
         image = pygame.image.load('graphics/player1.png').convert_alpha()
         player_surf = pygame.transform.scale(image, (self.w, self.h))
+        player_surf = pygame.transform.rotate(player_surf, -90)
         player_rect = player_surf.get_rect(center=self.center)
         player_image = player_surf
 
         return player_image, player_rect
 
-    def rotate_center(self, image, angle):
+    def rotate_center(self, image):
         rectangle = image.get_rect()
-        rotated_image = pygame.transform.rotate(image, angle)
+        rotated_image = pygame.transform.rotate(image, self.angle)
         rotated_rectangle = rectangle.copy()
         rotated_rectangle.center = rotated_image.get_rect().center
         rotated_image = rotated_image.subsurface(rotated_rectangle).copy()
         return rotated_image
 
-    def check_collisions(self, Apples):
+    def collisions_and_distance(self, Apples):
         if self.health < 0:
             self.kill()
         for apple in Apples:
+            temp_distance = np.sqrt(np.square(self.pos[0] - apple.pos[0]) + np.square(self.pos[1] - apple.pos[1]))
+            print(temp_distance)
+            if temp_distance < self.distance:
+                self.distance = temp_distance
             eats_apple = self.rect.colliderect(apple.rect)
             if eats_apple:
                 self.score += 1
-                self.health += 10
+                temp_health = self.health + 50
+                self.distance = 1500
+                if temp_health > 100:
+                    self.health = 100
+                else:
+                    self.health = temp_health
                 apple.kill()
         self.health -= 1
 
-    def draw_sensors(self, screen):
-        for radar in self.sensors:
-            position = radar[0]
-            pygame.draw.line(screen, (0, 255, 0), self.center, position, 1)
-            pygame.draw.circle(screen, (0, 255, 0), position, 5)
+    def cast_rays(self, screen):
+        start_angle = self.angle-30
+
+        for ray in range(CASTED_RAYS):
+            end = int(self.pos[0] - (math.sin(360-start_angle)) * 100), int(self.pos[1] + (math.cos(360-start_angle)) * 100)
+            pygame.draw.line(screen, (0, 255, 0), self.center, end, 2)
+            start_angle += 60
 
     def move(self, output, pos):
 
@@ -90,23 +102,20 @@ class AntBot(pygame.sprite.Sprite):
         elif choice[0] == 2:
             temp1 += math.cos(math.radians(360 - self.angle)) * self.speed
             temp2 += math.sin(math.radians(360 - self.angle)) * self.speed
-        elif choice[0] == 3:
-            temp1 -= math.cos(math.radians(360 - self.angle)) * self.speed
-            temp2 -= math.sin(math.radians(360 - self.angle)) * self.speed
+
 
         if skip:
             temp1 += math.cos(math.radians(360 - self.angle)) * self.speed
             temp2 += math.sin(math.radians(360 - self.angle)) * self.speed
 
         if (1000 - self.w / 2 > temp1 > self.w / 2) and (self.h / 2 < temp2 < 1000 - self.h / 2):
-            self.image = self.rotate_center(self.base_image, self.angle)
+            self.image = self.rotate_center(self.base_image)
             self.pos = temp1, temp2
-            print(self.pos)
             self.center = [self.pos[0] + self.h / 2, self.pos[1] + self.w / 2]
             self.rect = self.image.get_rect(center=self.center)
 
     def update(self, Apples, screen):
-        self.check_collisions(Apples)
-        self.draw_sensors(screen)
-        params = self.Brain.calculate(self.health, self.score)
+        self.collisions_and_distance(Apples)
+        # self.cast_rays(screen)
+        params = self.Brain.calculate(self.distance, self.health, self.score)
         self.move(*params, self.pos)
