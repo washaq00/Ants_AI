@@ -31,14 +31,14 @@ class AntBot(pygame.sprite.Sprite):
         self.image = self.base_image
 
         # Track the score
-        self.health = 200
+        self.health = 300
         self.score = 0
 
         # Moves our character
         self.Brain = NeuralNetwork()
 
     def __del__(self):
-        print(f"One ant is dead")
+        pass
 
     def load_image(self):
         image = pygame.image.load('graphics/player1.png').convert_alpha()
@@ -71,8 +71,8 @@ class AntBot(pygame.sprite.Sprite):
                 self.score += 1
                 temp_health = self.health + 50
                 self.distance = 1500
-                if temp_health > 200:
-                    self.health = 100
+                if temp_health > 300:
+                    self.health = 300
                 else:
                     self.health = temp_health
                 apple.kill()

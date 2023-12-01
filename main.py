@@ -46,9 +46,15 @@ def draw(dt=0):
     if len(AntsPopulation[0].Ants) != 0:
         AntsPopulation[0].update(screen, ApplesSpawner[0].Apples,dt)
         ApplesSpawner[0].update(dt, screen)
-        return True
     else:
-        return False
+        AntsPopulation.clear()
+        ApplesSpawner.clear()
+
+def new_gen():
+    AntsPopulation.append(AntsSpawner())
+    AntsPopulation[0].begin()
+    ApplesSpawner.append(AppleSpawner(spawnrate=0.0005, n_bots=20))
+    ApplesSpawner[0].begin()
 
 
 initialized = False
@@ -65,12 +71,9 @@ while True:  # all actions are being placed and updated in this loop
     if not AntsPopulation and not initialized:
         initialized = initialize()
     elif not AntsPopulation and initialized:
-        AntsPopulation.clear()
-        ApplesSpawner.clear()
+        new_gen()
 
-    if not draw(dt):
-        AntsPopulation.clear()
-        ApplesSpawner.clear()
+    draw(dt)
 
     pygame.display.update()
     clock.tick(60)
