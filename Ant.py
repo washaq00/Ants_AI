@@ -68,7 +68,7 @@ class AntBot(pygame.sprite.Sprite):
             self.calculate_distance(apple)
             eats_apple = self.rect.colliderect(apple.rect)
             if eats_apple:
-                self.score += 1
+                self.score += 50
                 temp_health = self.health + 50
                 self.distance = 1500
                 if temp_health > 300:

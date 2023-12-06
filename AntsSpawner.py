@@ -12,13 +12,10 @@ class AntsSpawner:
         for i in range(0, self.n_ants):
             self.Ants.add(AntBot())
 
-    def new_gen(self, previous_gen):
-        for i in range(self.n_ants):
-            self.Ants[i].Brain.copy(previous_gen.Ants[i])
-
-    def update(self,screen,Apples,dt):
+    def update(self,screen,Apples,CopiedPopulation):
         for ant in self.Ants:
-            if ant.health < 50:
+            if ant.health < 0:
+                CopiedPopulation.add(ant)
                 ant.remove(self.Ants)
         self.Ants.update(Apples, screen)
         self.Ants.draw(screen)
