@@ -1,55 +1,93 @@
 from AntsSpawner import AntsSpawner
 from Ant import AntBot
-def best_genes(population, N = 2):
+import numpy as np
 
-    """Function used for finding N (default 2) best genes
-        defined my own fitness score function"""
 
-    fitness_scores: list[[int,]] = []
+def best_genes(pop):
+    """
+
+    Function used for finding N (default 2) best genes,
+    defined my own fitness score function
+
+    """
+
+    fitness_scores: list[[int, ]] = []
     score: int
-    for ant in population:
+    for ant in pop:
         if ant.score < 1: ant.score = 1
-        score = (ant.score * 1000) / ant.distance
-        fitness_scores.append([score,ant])
+        score = (ant.score * 100) / ant.distance
+        fitness_scores.append((score, ant))
 
-    sorted_scores = sorted(fitness_scores, key= lambda x: x[0], reverse=True)
+    sorted_scores = sorted(fitness_scores, key=lambda x: x[0], reverse=True)
 
-    return sorted_scores[:N][1]
+    return sorted_scores
 
-def inheritance(parents):
-    kid1 = AntBot()
-    kid2 = AntBot()
 
-    self.score = Ant.score
-    self.distance = Ant.distance
-    self.Brain = Ant.Brain
+def mutate_and_inheritance(parents, mutation_chance=30) -> list:
+    # proportion_dict = {
+    #     "60:40": 0.6,
+    #     "70:30": 0.7,
+    #     "80:20": 0.8
+    # }
 
-    return
+    kids = [AntBot() for i in range(0, 2)]
 
-def new_population(copied_population, P=2):
+    for id_kid, kid in enumerate(kids):
+        for id_layer, (layer, is_activated) in enumerate(kid.Brain.layers):
 
-    """New population consists of:
+            # custom_range = [[0, layer.input_size * proportion_dict[variant]],
+            #                     [layer.input_size * proportion_dict[variant], layer.input_size]]
+
+            if not is_activated:
+                for i in range(0, layer.input_size):
+                    print(layer.output_size /2)
+                    for j in range(0, int(layer.output_size /2)):
+                        if mutation_chance > np.random.randint(0, 100):
+                            layer.weights[i, j] = np.random.randn(1, 1)
+                            layer.bias[0, j] = np.random.randn(1, 1)
+                        else:
+                            layer.weights[i, j] = parents[id_kid].Brain.layers[id_layer][0].weights[i, j]
+                            layer.bias[0, j] = parents[id_kid].Brain.layers[id_layer][0].bias[0, j]
+                for i in range(0, layer.input_size):
+                    for j in range(int(layer.output_size /2), layer.output_size):
+                        if mutation_chance > np.random.randint(0, 100):
+                            layer.weights[i, j] = np.random.randn(1, 1)
+                            layer.bias[0, j] = np.random.randn(1, 1)
+                        else:
+                            layer.weights[i, j] = parents[id_kid].Brain.layers[id_layer][0].weights[i, j]
+                            layer.bias[0, j] = parents[id_kid].Brain.layers[id_layer][0].bias[0, j]
+            else:
+                pass
+
+    return kids
+
+
+def population(copied_population, P=2):
+    """
+
+    New population consists of:
                                 - 2 parents - best ants from previous population
                                 - 2 kids that inherit mutated genes from parents
                                 - N new randomly generated ants
+
     """
 
-    parents = best_genes(copied_population)
+    sorted_population = [genes[1] for genes in best_genes(copied_population)]
+    parents = sorted_population[:2]
+    print(sorted_population)
+    new_population = AntsSpawner()
 
-    new_pop = AntsSpawner()
-    for i in range(0, new_pop.n_ants-P**2):
-        new_pop.Ants.add(AntBot())
+    for i in range(0, (len(sorted_population)-2)):
+        new_population.Ants.add(AntBot())
 
-    for i in range(0,P):
-        new_pop.Ants.add(parents[i])
+    for id,ant in enumerate(new_population.Ants):
+        ant.Brain = sorted_population[id].Brain
 
-    kids = inheritance(parents)
+    kids = mutate_and_inheritance(parents)
 
-    for i in range(0,P):
-        new_pop.Ants.add(kids[i])
+    for i in range(0, P):
+        new_population.Ants.add(kids[i])
 
-    return new_pop
+    print(new_population)
 
-
-
-
+    return new_population
