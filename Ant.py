@@ -20,11 +20,13 @@ class AntBot(pygame.sprite.Sprite):
         # Basic variables
         self.pos = pygame.math.Vector2(randint(self.w, 1000 - self.w), randint(self.h, 1000 - self.h))
         self.center = [self.pos[0] + self.h / 2, self.pos[1] + self.w / 2]
-        self.angle = np.random.randint(0,90)
+        self.angle = np.random.randint(0,360)
         self.speed = 3
 
         #distance to the closest apple
-        self.distance = 1000
+        self.distance = 0
+        self.distance_x = 0
+        self.distance_y = 0
 
         # Loading image and rotated image
         self.base_image, self.rect = self.load_image()
@@ -58,24 +60,36 @@ class AntBot(pygame.sprite.Sprite):
         return rotated_image
 
     def calculate_distance(self, apple):
-        temp_distance = np.sqrt(np.square(self.pos[0] - apple.pos[0]) + np.square(self.pos[1] - apple.pos[1]))
-        if temp_distance < self.distance:
-            self.distance = temp_distance
+        distance_x = math.fabs(self.pos[0] - apple.pos[0])
+        distance_y = math.fabs(self.pos[1] - apple.pos[1])
+        temp_distance = np.sqrt(np.square(distance_x) + np.square(distance_y))
+        return temp_distance, distance_x, distance_y
 
     def collisions_and_distance(self, Apples):
-
+        distance = 10000
+        distance_x = 10000
+        distance_y = 10000
         for apple in Apples:
-            self.calculate_distance(apple)
+            temp_distance, temp_distance_x, temp_distance_y = self.calculate_distance(apple)
+            if distance > temp_distance:
+                distance = temp_distance
+            if distance_x > temp_distance_x:
+                distance_x = temp_distance_x
+            if distance_y > temp_distance_y:
+                distance_y = temp_distance_y
             eats_apple = self.rect.colliderect(apple.rect)
             if eats_apple:
                 self.score += 50
-                temp_health = self.health + 50
-                self.distance = 1500
+                temp_health = self.health + 100
                 if temp_health > 300:
                     self.health = 300
                 else:
                     self.health = temp_health
                 apple.kill()
+        self.distance = distance
+        self.distance_x = distance_x
+        self.distance_y = distance_y
+
         self.health -= 1
 
     def cast_rays(self, screen):
@@ -118,5 +132,5 @@ class AntBot(pygame.sprite.Sprite):
     def update(self, Apples, screen):
         self.collisions_and_distance(Apples)
         # self.cast_rays(screen)
-        params = self.Brain.forward(self.distance, self.health)
+        params = self.Brain.forward(self.distance_x, self.distance_y, self.health, self.score)
         self.move(*params, self.pos)

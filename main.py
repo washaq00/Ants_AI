@@ -34,20 +34,22 @@ def initialize():
     AntsPopulation[0].begin()
 
     # Spawn apples in random locations
-    ApplesSpawner.append(AppleSpawner(spawnrate=0.0005, n_bots=30))
+    ApplesSpawner.append(AppleSpawner(n_bots=50))
     ApplesSpawner[0].begin()
     return True
 
 
 # drawing characters
-def draw():
+def draw(t):
 
     if len(AntsPopulation[0].Ants) != 0:
         AntsPopulation[0].update(screen, ApplesSpawner[0].Apples, CopyOfPopulation)
-        ApplesSpawner[0].update(dt, screen)
+        ApplesSpawner[0].update(t, screen)
+
     else:
         AntsPopulation.clear()
         ApplesSpawner.clear()
+
 
 initialized = False
 pop_counter:int = 0
@@ -65,12 +67,13 @@ while True:
         pop_counter += 1
     elif not AntsPopulation and initialized:
         pop_counter += 1
-        ApplesSpawner.append(AppleSpawner(spawnrate=0.0005, n_bots=20))
+        ApplesSpawner.append(AppleSpawner(n_bots=50))
         ApplesSpawner[0].begin()
+
         AntsPopulation.append(population(CopyOfPopulation))
         CopyOfPopulation.empty()
 
-    draw()
+    draw(dt)
     text = font.render(f'Population: {pop_counter}', True, color2)
     textRect = text.get_rect()
     textRect.center = (90, 40)
