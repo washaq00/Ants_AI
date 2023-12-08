@@ -23,7 +23,7 @@ def best_genes(pop):
     return sorted_scores
 
 
-def mutate_and_inheritance(parents, mutation_chance=30) -> list:
+def mutate_and_inheritance(parents, mutation_chance=70) -> list:
     # proportion_dict = {
     #     "60:40": 0.6,
     #     "70:30": 0.7,
@@ -40,7 +40,6 @@ def mutate_and_inheritance(parents, mutation_chance=30) -> list:
 
             if not is_activated:
                 for i in range(0, layer.input_size):
-                    print(layer.output_size /2)
                     for j in range(0, int(layer.output_size /2)):
                         if mutation_chance > np.random.randint(0, 100):
                             layer.weights[i, j] = np.random.randn(1, 1)
@@ -74,7 +73,6 @@ def population(copied_population, P=2):
 
     sorted_population = [genes[1] for genes in best_genes(copied_population)]
     parents = sorted_population[:2]
-    print(sorted_population)
     new_population = AntsSpawner()
 
     for i in range(0, (len(sorted_population)-2)):
@@ -87,7 +85,5 @@ def population(copied_population, P=2):
 
     for i in range(0, P):
         new_population.Ants.add(kids[i])
-
-    print(new_population)
 
     return new_population

@@ -2,7 +2,7 @@ from Ant import AntBot
 import pygame as pg
 
 class AntsSpawner:
-    def __init__(self, n_bots=8, mutation = False):
+    def __init__(self, n_bots=10, mutation = False):
         self.Ants = pg.sprite.Group()
         self.n_ants = n_bots
         self.mutated = mutation
