@@ -2,7 +2,7 @@ import pygame
 from sys import exit
 from AppleSpawner import AppleSpawner
 from AntsSpawner import AntsSpawner
-from GA import best_genes, new_population
+from GA import best_genes, population
 
 window_size_h = 1000
 window_size_w = 1000
@@ -34,7 +34,7 @@ def initialize():
     AntsPopulation[0].begin()
 
     # Spawn apples in random locations
-    ApplesSpawner.append(AppleSpawner(spawnrate=0.0005, n_bots=20))
+    ApplesSpawner.append(AppleSpawner(spawnrate=0.0005, n_bots=30))
     ApplesSpawner[0].begin()
     return True
 
@@ -67,8 +67,8 @@ while True:
         pop_counter += 1
         ApplesSpawner.append(AppleSpawner(spawnrate=0.0005, n_bots=20))
         ApplesSpawner[0].begin()
-        AntsPopulation.append(new_population())
-
+        AntsPopulation.append(population(CopyOfPopulation))
+        CopyOfPopulation.empty()
 
     draw()
     text = font.render(f'Population: {pop_counter}', True, color2)

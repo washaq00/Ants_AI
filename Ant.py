@@ -118,5 +118,5 @@ class AntBot(pygame.sprite.Sprite):
     def update(self, Apples, screen):
         self.collisions_and_distance(Apples)
         # self.cast_rays(screen)
-        params = self.Brain.forward(self.distance, self.health, self.score)
+        params = self.Brain.forward(self.distance, self.health)
         self.move(*params, self.pos)
