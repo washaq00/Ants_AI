@@ -34,7 +34,7 @@ def initialize():
     AntsPopulation[0].begin()
 
     # Spawn apples in random locations
-    ApplesSpawner.append(AppleSpawner(n_bots=50))
+    ApplesSpawner.append(AppleSpawner())
     ApplesSpawner[0].begin()
     return True
 
@@ -67,7 +67,7 @@ while True:
         pop_counter += 1
     elif not AntsPopulation and initialized:
         pop_counter += 1
-        ApplesSpawner.append(AppleSpawner(n_bots=50))
+        ApplesSpawner.append(AppleSpawner())
         ApplesSpawner[0].begin()
 
         AntsPopulation.append(population(CopyOfPopulation))

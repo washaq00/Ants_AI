@@ -4,11 +4,21 @@ import math
 from random import randint
 from NN import NeuralNetwork
 
-CASTED_RAYS = 2
+CASTED_RAYS = 1
 
 
 def clamp(num, min_value, max_value):
     return max(min(num, max_value), min_value)
+
+
+def calculate_angle(point1, point2, invert=-1):
+    if point2[0] - point1[0] == 0:
+        if point2[1] - point1[1] > 0:
+            return 90
+        else:
+            return -90
+    else:
+        return math.degrees(math.atan2(invert * (point2[1] - point1[1]), (point2[0] - point1[0])))
 
 
 class AntBot(pygame.sprite.Sprite):
@@ -21,12 +31,13 @@ class AntBot(pygame.sprite.Sprite):
         self.pos = pygame.math.Vector2(randint(self.w, 1000 - self.w), randint(self.h, 1000 - self.h))
         self.center = [self.pos[0] + self.h / 2, self.pos[1] + self.w / 2]
         self.angle = np.random.randint(0,360)
-        self.speed = 3
+        self.speed = 2
 
         #distance to the closest apple
         self.distance = 0
         self.distance_x = 0
         self.distance_y = 0
+        self.angle_diff = 0
 
         # Loading image and rotated image
         self.base_image, self.rect = self.load_image()
@@ -60,8 +71,8 @@ class AntBot(pygame.sprite.Sprite):
         return rotated_image
 
     def calculate_distance(self, apple):
-        distance_x = math.fabs(self.pos[0] - apple.pos[0])
-        distance_y = math.fabs(self.pos[1] - apple.pos[1])
+        distance_x = self.pos[0] - apple.pos[0]
+        distance_y = self.pos[1] - apple.pos[1]
         temp_distance = np.sqrt(np.square(distance_x) + np.square(distance_y))
         return temp_distance, distance_x, distance_y
 
@@ -69,14 +80,13 @@ class AntBot(pygame.sprite.Sprite):
         distance = 10000
         distance_x = 10000
         distance_y = 10000
+
         for apple in Apples:
             temp_distance, temp_distance_x, temp_distance_y = self.calculate_distance(apple)
             if distance > temp_distance:
-                distance = temp_distance
-            if distance_x > temp_distance_x:
                 distance_x = temp_distance_x
-            if distance_y > temp_distance_y:
                 distance_y = temp_distance_y
+                closest_apple = apple
             eats_apple = self.rect.colliderect(apple.rect)
             if eats_apple:
                 self.score += 50
@@ -89,16 +99,12 @@ class AntBot(pygame.sprite.Sprite):
         self.distance = distance
         self.distance_x = distance_x
         self.distance_y = distance_y
+        self.angle_diff = calculate_angle(self.pos,closest_apple.pos)
 
         self.health -= 1
 
     def cast_rays(self, screen):
-        start_angle = self.angle-30
-
-        for ray in range(CASTED_RAYS):
-            end = int(self.pos[0] - (math.sin(360-start_angle)) * 100), int(self.pos[1] + (math.cos(360-start_angle)) * 100)
-            pygame.draw.line(screen, (0, 255, 0), self.center, end, 2)
-            start_angle += 60
+        self.draw_sensor(screen)
 
     def move(self, output, pos):
 
@@ -109,11 +115,15 @@ class AntBot(pygame.sprite.Sprite):
         temp1 = pos[0]
         temp2 = pos[1]
 
+        temp_angle = self.angle
+
         if choice[0] == 0:
-            self.angle += 10
+            temp_angle += 10
+            self.angle = temp_angle%360
             skip = True
         elif choice[0] == 1:
-            self.angle -= 10
+            temp_angle -= 10
+            self.angle = temp_angle % 360
             skip = True
         elif choice[0] == 2:
             temp1 += math.cos(math.radians(360 - self.angle)) * self.speed
@@ -129,8 +139,27 @@ class AntBot(pygame.sprite.Sprite):
             self.center = [self.pos[0] + self.h / 2, self.pos[1] + self.w / 2]
             self.rect = self.image.get_rect(center=self.center)
 
+    def draw_sensor(self, screen):
+        start_angle, stop_angle = self.angle - 45,self.angle + 45
+        rect = self.rect.copy()
+        rect.scale_by_ip(4.0,4.0)
+        pygame.draw.arc(screen,(255, 0, 0),rect,start_angle*math.pi/180, stop_angle*math.pi/180, 2)
+
+    def calculate_angle_diff(self,org_angle, food_angle):
+        food_angle %= 360
+        angle_difference = org_angle - food_angle
+
+        if angle_difference > 180:
+            angle_difference -= 360
+        if angle_difference < -180:
+            angle_difference += 360
+
+        return angle_difference
+
     def update(self, Apples, screen):
         self.collisions_and_distance(Apples)
-        # self.cast_rays(screen)
-        params = self.Brain.forward(self.distance_x, self.distance_y, self.health, self.score)
+        self.cast_rays(screen)
+        params = self.Brain.forward(self.distance, self.angle_diff,self.health)
         self.move(*params, self.pos)
+
+
