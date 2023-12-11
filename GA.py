@@ -15,6 +15,7 @@ def best_genes(pop):
     score: int
     for ant in pop:
         if ant.score < 1: ant.score = 1
+        if ant.distance < 1: ant.distance = 10000
         score = (ant.score * 100) / ant.distance
         fitness_scores.append((score, ant))
 
