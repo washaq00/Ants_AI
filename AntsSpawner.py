@@ -20,5 +20,12 @@ class AntsSpawner:
         self.Ants.update(Apples, screen)
         self.Ants.draw(screen)
 
+    # def best_time(self):
+    #
+    # def best_score(self):
+    #
+    #
+    #         min(self.Ants)
+
 
 

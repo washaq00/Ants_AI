@@ -3,7 +3,7 @@ import pygame as pg
 
 
 class AppleSpawner:
-    def __init__(self, spawnrate = 3, n_bots = 0):
+    def __init__(self, spawnrate = 1.5, n_bots = 50):
         self.sr: float = spawnrate
         self.Apples = pg.sprite.Group()
         self.timeElapsed: int = 0

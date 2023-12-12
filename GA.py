@@ -15,6 +15,7 @@ def best_genes(pop):
     score: int
     for ant in pop:
         if ant.score < 1: ant.score = 1
+        if ant.distance < 1: ant.distance = 10000
         score = (ant.score * 100) / ant.distance
         fitness_scores.append((score, ant))
 
@@ -23,7 +24,7 @@ def best_genes(pop):
     return sorted_scores
 
 
-def mutate_and_inheritance(parents, mutation_chance=70) -> list:
+def mutate_and_inheritance(parents, mutation_chance=30) -> list:
     # proportion_dict = {
     #     "60:40": 0.6,
     #     "70:30": 0.7,
@@ -66,8 +67,8 @@ def population(copied_population, P=2):
 
     New population consists of:
                                 - 2 parents - best ants from previous population
-                                - 2 kids that inherit mutated genes from parents
-                                - N new randomly generated ants
+                                - 2 kids that inherit mutated genes from parents and they replace the worst ants
+                                - rest of the previous population
 
     """
 

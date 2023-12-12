@@ -7,8 +7,8 @@ class DenseLayer(Layer):
         super().__init__()
         self.input_size = input_size
         self.output_size = output_size
-        self.weights = np.random.randn(input_size, output_size)
-        self.bias = np.random.randn(1, output_size)
+        self.weights = np.random.randn(input_size, output_size) - 0.5
+        self.bias = np.random.randn(1, output_size) - 0.5
 
     def forward(self, input_data):
         return np.dot(input_data, self.weights) + self.bias
