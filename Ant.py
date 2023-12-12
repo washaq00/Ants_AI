@@ -49,8 +49,8 @@ class AntBot(pygame.sprite.Sprite):
         self.distance = 0
         self.distance_x = 0
         self.distance_y = 0
-        self.vision_angle = 40
-        self.vision_radius = 80
+        self.vision_angle = 30
+        self.vision_radius = 250
         self.angle_diff = 0
 
         # Loading image and rotated image
@@ -105,11 +105,11 @@ class AntBot(pygame.sprite.Sprite):
         return False
 
     def in_range(self, apple):
-        if (self.pos[0] - (apple.pos[0])) ** 2 + (self.pos[1] - (apple.pos[1])) ** 2 < self.vision_radius ** 2:
+        if self.calculate_distance(apple) < self.vision_radius:
             apple_angle = calculate_angle(self.pos, apple.pos)
             left_bound = (self.angle - self.vision_angle) % 360
             right_bound = (self.angle + self.vision_angle) % 360
-            if (left_bound < - apple_angle % 360 < right_bound) or (right_bound < left_bound and not (right_bound < -apple_angle % 360 < left_bound)):
+            if (left_bound < apple_angle % 360 < right_bound) or (right_bound < left_bound and not (right_bound < apple_angle % 360 < left_bound)):
                 return True
         return False
 
@@ -121,7 +121,6 @@ class AntBot(pygame.sprite.Sprite):
                 temp_distance = calculated
                 closest_apple = apple
 
-        print(closest_apple.pos)
         if closest_apple is not None:
             pygame.draw.line(screen, (255,0,0),self.pos, closest_apple.pos, width=1)
             self.angle_diff = calculate_angle_diff(self.angle, calculate_angle(self.pos, closest_apple.pos))
@@ -129,8 +128,9 @@ class AntBot(pygame.sprite.Sprite):
 
     def loop_for_apples(self,Apples, screen):
         apples_in_range = []
-        for apple in Apples:
+        for apple in Apples.Apples:
             if self.eating_food(apple):
+                Apples.nApples -= 1
                 continue
             if self.in_range(apple):
                 apples_in_range.append(apple)
@@ -146,31 +146,35 @@ class AntBot(pygame.sprite.Sprite):
         return temp1, temp2
 
     def turn_right(self):
-        self.angle += 10
+        self.angle += 3
 
     def turn_left(self):
-        self.angle -= 10
+        self.angle -= 3
 
     def move(self, output, pos):
 
         max_val = max(output)
         choice = np.where(output == max_val)
+        temp1, temp2 = 0,0
 
         if choice[0] == 0:
             self.turn_left()
         elif choice[0] == 1:
             self.turn_right()
-        else:
-            pass
 
-        self.angle = self.angle % 360
+        # elif choice[0] == 2:
+        #     temp1, temp2 = self.forward(pos)
+
         temp1, temp2 = self.forward(pos)
 
+        self.angle = self.angle % 360
+        self.image = self.rotate_center(self.base_image)
+        self.rect = self.image.get_rect(topleft=self.pos)
+        self.center = self.rect.center
+
         if (1000 - self.w / 2 > temp1 > self.w / 2) and (self.h / 2 < temp2 < 1000 - self.h / 2):
-            self.image = self.rotate_center(self.base_image)
             self.pos = temp1, temp2
-            self.rect = self.image.get_rect(topleft=self.pos)
-            self.center = self.rect.center
+
 
     def draw_rect(self, screen):
         pygame.draw.rect(screen,(255,0,0),self.rect)
@@ -180,8 +184,8 @@ class AntBot(pygame.sprite.Sprite):
         rect = pygame.Rect(self.pos[0]-self.vision_radius*2*0.5+self.w*0.5, self.pos[1]-self.vision_radius*2*0.5+self.h*0.5, self.vision_radius*2, self.vision_radius*2)
         pygame.draw.arc(screen,(255, 0, 0),rect,start_angle*math.pi/180, stop_angle*math.pi/180, 2)
 
-    def update(self, Apples, screen):
-        self.loop_for_apples(Apples, screen)
+    def update(self, AppleSpawner, screen):
+        self.loop_for_apples(AppleSpawner, screen)
         self.draw_sensor(screen)
         print(self.angle_diff)
         params = self.Brain.forward(self.distance, self.angle_diff)

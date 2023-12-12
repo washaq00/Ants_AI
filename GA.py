@@ -67,8 +67,8 @@ def population(copied_population, P=2):
 
     New population consists of:
                                 - 2 parents - best ants from previous population
-                                - 2 kids that inherit mutated genes from parents
-                                - N new randomly generated ants
+                                - 2 kids that inherit mutated genes from parents and they replace the worst ants
+                                - rest of the previous population
 
     """
 

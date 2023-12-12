@@ -43,7 +43,7 @@ def initialize():
 def draw(t):
 
     if len(AntsPopulation[0].Ants) != 0:
-        AntsPopulation[0].update(screen, ApplesSpawner[0].Apples, CopyOfPopulation)
+        AntsPopulation[0].update(screen, ApplesSpawner[0], CopyOfPopulation)
         ApplesSpawner[0].update(t, screen)
 
     else:
