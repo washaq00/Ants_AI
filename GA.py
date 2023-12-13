@@ -24,7 +24,7 @@ def best_genes(pop):
     return sorted_scores
 
 
-def mutate_and_inheritance(parents, mutation_chance=30) -> list:
+def mutate_and_inheritance(parents, mutation_chance=70) -> list:
     # proportion_dict = {
     #     "60:40": 0.6,
     #     "70:30": 0.7,

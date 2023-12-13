@@ -86,10 +86,7 @@ class AntBot(pygame.sprite.Sprite):
         return rotated_image
 
     def calculate_distance(self, apple):
-        distance_x = self.pos[0] - apple.pos[0]
-        distance_y = self.pos[1] - apple.pos[1]
-        temp_distance = np.sqrt(np.square(distance_x) + np.square(distance_y))
-        return temp_distance
+        return np.sqrt(np.square(self.center[0] - apple.pos[0]) + np.square(self.center[1] - apple.pos[1]))
 
     def eating_food(self, apple):
         eats_apple = self.rect.colliderect(apple.rect)
@@ -122,7 +119,7 @@ class AntBot(pygame.sprite.Sprite):
                 closest_apple = apple
 
         if closest_apple is not None:
-            pygame.draw.line(screen, (255,0,0),self.pos, closest_apple.pos, width=1)
+            pygame.draw.line(screen, (255,0,0),self.center, closest_apple.pos, width=2)
             self.angle_diff = calculate_angle_diff(self.angle, calculate_angle(self.pos, closest_apple.pos))
             self.distance = temp_distance
 
@@ -140,10 +137,10 @@ class AntBot(pygame.sprite.Sprite):
 
     def forward(self, pos):
         temp1 = pos[0]
-        temp2 = pos[1]
+        temp2= pos[1]
         temp1 += math.cos(math.radians(360 - self.angle)) * self.speed
         temp2 += math.sin(math.radians(360 - self.angle)) * self.speed
-        return temp1, temp2
+        return temp1,temp2
 
     def turn_right(self):
         self.angle += 3
@@ -180,17 +177,17 @@ class AntBot(pygame.sprite.Sprite):
         pygame.draw.rect(screen,(255,0,0),self.rect)
 
     def draw_sensor(self, screen):
-        start_angle, stop_angle = self.angle - self.vision_angle,self.angle + self.vision_angle
+        start_angle, stop_angle = self.angle - self.vision_angle, self.angle + self.vision_angle
         rect = pygame.Rect(self.pos[0]-self.vision_radius*2*0.5+self.w*0.5, self.pos[1]-self.vision_radius*2*0.5+self.h*0.5, self.vision_radius*2, self.vision_radius*2)
         pygame.draw.arc(screen,(255, 0, 0),rect,start_angle*math.pi/180, stop_angle*math.pi/180, 2)
 
     def update(self, AppleSpawner, screen):
         self.loop_for_apples(AppleSpawner, screen)
         self.draw_sensor(screen)
-        print(self.angle_diff)
+        # print(self.angle_diff)
         params = self.Brain.forward(self.distance, self.angle_diff)
         self.move(*params, self.pos)
-        self.draw_rect(screen)
+        # self.draw_rect(screen)
         self.health -= 1
 
 
