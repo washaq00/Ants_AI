@@ -52,7 +52,8 @@ def draw(t):
 
 
 initialized = False
-pop_counter:int = 0
+pop_counter: int = 0
+score: int = 0
 
 while True:
     dt = pygame.time.get_ticks()
@@ -73,8 +74,10 @@ while True:
         AntsPopulation.append(population(CopyOfPopulation))
         CopyOfPopulation.empty()
 
+    score = max(score, AntsPopulation[0].best_score())
+
     draw(dt)
-    text = font.render(f'Population: {pop_counter}', True, color2)
+    text = font.render(f'Population: {pop_counter} best score: {score}', True, color2)
     textRect = text.get_rect()
     textRect.center = (90, 40)
     screen.blit(text, textRect)

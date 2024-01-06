@@ -12,12 +12,12 @@ class NeuralNetwork():
 
     def __init__(self):
         self.layers: list[tuple] = []
-        self.layers.append((DenseLayer(input_size=2, output_size=15), False))
+        self.layers.append((DenseLayer(input_size=2, output_size=30), False))
         self.layers.append((ActivationLayer(activation=tanh), True))
-        self.layers.append((DenseLayer(input_size=15, output_size=3), False))
+        self.layers.append((DenseLayer(input_size=30, output_size=30), False))
         self.layers.append((ActivationLayer(activation=tanh), True))
-        # self.layers.append((DenseLayer(input_size=10, output_size=3), False))
-        # self.layers.append((ActivationLayer(activation=tanh), True))
+        self.layers.append((DenseLayer(input_size=30, output_size=3), False))
+        self.layers.append((ActivationLayer(activation=tanh), True))
 
     def forward(self, *input_data):
         results = input_data
