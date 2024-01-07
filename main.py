@@ -24,38 +24,39 @@ color = (255, 0, 0)
 color2 = (0, 0, 255)
 color3 = (30, 224, 27)
 
-AntsPopulation = []
-CopyOfPopulation = pygame.sprite.Group()
-ApplesSpawner = []
+ants_population = []
+copy_population = pygame.sprite.Group()
+apples_spawner = []
+
 
 def initialize():
     # Create the population of ants
-    AntsPopulation.append(AntsSpawner())
-    AntsPopulation[0].begin()
+    ants_population.append(AntsSpawner())
+    ants_population[0].begin()
 
     # Spawn apples in random locations
-    ApplesSpawner.append(AppleSpawner())
-    ApplesSpawner[0].begin()
+    apples_spawner.append(AppleSpawner())
+    apples_spawner[0].begin()
     return True
 
 
 # drawing characters
 def draw(t):
-
-    if len(AntsPopulation[0].Ants) != 0:
-        AntsPopulation[0].update(screen, ApplesSpawner[0], CopyOfPopulation)
-        ApplesSpawner[0].update(t, screen)
+    if len(ants_population[0].Ants) != 0:
+        ants_population[0].update(screen, apples_spawner[0], copy_population)
+        apples_spawner[0].update(t, screen)
 
     else:
-        AntsPopulation.clear()
-        ApplesSpawner.clear()
+        ants_population.clear()
+        apples_spawner.clear()
 
 
 initialized = False
 pop_counter: int = 0
 score: int = 0
+list_of_scores = []
 
-while True:
+while pop_counter <= 20:
     dt = pygame.time.get_ticks()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -63,23 +64,30 @@ while True:
             exit()
 
     screen.blit(background_surface, (0, 0))
-    if not AntsPopulation and not initialized:
+    if not ants_population and not initialized:
         initialized = initialize()
         pop_counter += 1
-    elif not AntsPopulation and initialized:
+        if score:
+            list_of_scores.append(score)
+            score = 0
+    elif not ants_population and initialized:
         pop_counter += 1
-        ApplesSpawner.append(AppleSpawner())
-        ApplesSpawner[0].begin()
+        apples_spawner.append(AppleSpawner())
+        apples_spawner[0].begin()
+        if score:
+            list_of_scores.append(score)
+            score = 0
+        ants_population.append(population(copy_population))
+        copy_population.empty()
 
-        AntsPopulation.append(population(CopyOfPopulation))
-        CopyOfPopulation.empty()
-
-    score = max(score, AntsPopulation[0].best_score())
+    score = max(score, ants_population[0].best_score())
 
     draw(dt)
-    text = font.render(f'Population: {pop_counter} best score: {score}', True, color2)
+    text = font.render(f'Population: {pop_counter} | best score: {score}', True, color2)
     textRect = text.get_rect()
-    textRect.center = (90, 40)
+    textRect.midleft = (0, 40)
     screen.blit(text, textRect)
     pygame.display.update()
     clock.tick(60)
+
+print(list_of_scores)
